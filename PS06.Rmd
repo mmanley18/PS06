@@ -1,6 +1,6 @@
 ---
 title: "STAT/MATH 495: Problem Set 06"
-author: "WRITE YOUR NAME HERE"
+author: "Meredith Manley"
 date: "2017-10-17"
 output:
   html_document:
@@ -95,7 +95,120 @@ n_sample <- 10000
 
 # Computation
 
+
+### Spline Model df=2
 ```{r}
+MSE_list2 <- c()
+
+Var_list2 <- c()
+
+Bias_list2 <- c()
+
+# dataset of true value
+true_y <- rep(0.95^2, 500)
+
+for(i in 1:10000) {
+  sampled_points <- generate_sample(f, n, sigma)
+
+  # Fit splines with df=2 and add to plot
+  model1 <- smooth.spline(x=sampled_points$x, y=sampled_points$y, df=2) 
+  
+  # Predictions
+  y_hat <- predict(model1, newdata=test_set) %>% 
+  tibble::as.tibble()
+  y_hat <- y_hat$y
+  
+  # MSE and RMSE
+  MSE <- mean((true_y - y_hat)^2)
+  RMSE <- sqrt(MSE)
+  
+  MSE_list2[length(MSE_list2)+1] = MSE
+  
+  # Bias
+  bias_sqr <- (mean(true_y - y_hat))^2
+  
+  Bias_list2[length(Bias_list2)+1] = bias_sqr
+  
+  # Variance
+  variance <- var(y_hat)
+  
+  Var_list2[length(Var_list2)+1] = variance
+}
+
+# Sigma-Squared
+sigma_sqr <- (sigma)^2
+
+MSE_final <- mean(MSE_list2)
+Bias <- mean(Bias_list2)
+Var <- mean(Var_list2)
+sigma_sqr <- (sigma)^2
+
+Total <- Bias + Var + sigma_sqr
+
+table <- matrix(c(MSE_final, Bias, Var, sigma_sqr, Total),ncol=5,byrow=TRUE)
+colnames(table) <- c("MSE","Bias-Squared","Variance", "Irreducible", "Sum")
+rownames(table) <- c("X")
+table <- as.table(table)
+table
+
+```
+
+
+
+### Spline Model df=99
+```{r}
+MSE_list99 <- c()
+
+Var_list99 <- c()
+
+Bias_list99 <- c()
+
+# dataset of true value
+true_y <- rep(0.95^2, 500)
+
+for(i in 1:10000) {
+  sampled_points <- generate_sample(f, n, sigma)
+
+  # Fit splines with df=2 and add to plot
+  model1 <- smooth.spline(x=sampled_points$x, y=sampled_points$y, df=99) 
+  
+  # Predictions
+  y_hat <- predict(model1, newdata=test_set) %>% 
+  tibble::as.tibble()
+  y_hat <- y_hat$y
+  
+  # MSE and RMSE
+  MSE <- mean((true_y - y_hat)^2)
+  RMSE <- sqrt(MSE)
+  
+  MSE_list99[length(MSE_list99)+1] = MSE
+  
+  # Bias
+  bias_sqr <- (mean(true_y - y_hat))^2
+  
+  Bias_list99[length(Bias_list99)+1] = bias_sqr
+  
+  # Variance
+  variance <- var(y_hat)
+  
+  Var_list99[length(Var_list99)+1] = variance
+}
+
+# Sigma-Squared
+sigma_sqr <- (sigma)^2
+
+MSE_final <- mean(MSE_list99)
+Bias <- mean(Bias_list99)
+Var <- mean(Var_list99)
+sigma_sqr <- (sigma)^2
+
+Total <- Bias + Var + sigma_sqr
+
+table <- matrix(c(MSE_final, Bias, Var, sigma_sqr, Total),ncol=5,byrow=TRUE)
+colnames(table) <- c("MSE","Bias-Squared","Variance", "Irreducible", "Sum")
+rownames(table) <- c("X")
+table <- as.table(table)
+table
 
 ```
 
@@ -111,7 +224,8 @@ output tables comparing:
 
 |  MSE| bias_squared|   var| irreducible|   sum|
 |----:|------------:|-----:|-----------:|-----:|
-|     X|           X  |     X |      X |         X |
+|     X|           X  |     X |    X |          |
+
 
 where `sum = bias_squared + var + irreducible`. You can created cleanly formatted tables like the one above by piping a data frame into `knitr::kable(digits=4)`.
 
@@ -131,6 +245,8 @@ $x$ in this example, and not just for $$\mbox{MSE}\left[\widehat{f}(x_0)\right]
 
 **Answers**:
 
-1.
-1.
-1.
+1. One possible sanity check would be to test your model on new data or your whole training dataset and see if it is accurate in its predictions.
+1. If we wanted to get the breakdown of $\mbox{MSE}\left[\widehat{f}(x)\right]$ for *all*
+$x$ in this example, and not just for $$\mbox{MSE}\left[\widehat{f}(x_0)\right]
+= \mbox{MSE}\left[\widehat{f}(0.95)\right]$$ then we would need to do the procedure above, but for each $x$ in the training dataset from 1:500 rather than just 0.95.
+1. I would choose the model with the df=99 because over time on average the model does well in predicting the outcome. Evidence of the law of large numbers.

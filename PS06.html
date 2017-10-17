@@ -9,7 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="author" content="WRITE YOUR NAME HERE" />
+<meta name="author" content="Meredith Manley" />
 
 <meta name="date" content="2017-10-17" />
 
@@ -216,7 +216,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">STAT/MATH 495: Problem Set 06</h1>
-<h4 class="author"><em>WRITE YOUR NAME HERE</em></h4>
+<h4 class="author"><em>Meredith Manley</em></h4>
 <h4 class="date"><em>2017-10-17</em></h4>
 
 </div>
@@ -268,6 +268,120 @@ n_sample &lt;- 10000</code></pre>
 </div>
 <div id="computation" class="section level1">
 <h1>Computation</h1>
+<div id="spline-model-df2" class="section level3">
+<h3>Spline Model df=2</h3>
+<pre class="r"><code>MSE_list2 &lt;- c()
+
+Var_list2 &lt;- c()
+
+Bias_list2 &lt;- c()
+
+# dataset of true value
+true_y &lt;- rep(0.95^2, 500)
+
+for(i in 1:10000) {
+  sampled_points &lt;- generate_sample(f, n, sigma)
+
+  # Fit splines with df=2 and add to plot
+  model1 &lt;- smooth.spline(x=sampled_points$x, y=sampled_points$y, df=2) 
+  
+  # Predictions
+  y_hat &lt;- predict(model1, newdata=test_set) %&gt;% 
+  tibble::as.tibble()
+  y_hat &lt;- y_hat$y
+  
+  # MSE and RMSE
+  MSE &lt;- mean((true_y - y_hat)^2)
+  RMSE &lt;- sqrt(MSE)
+  
+  MSE_list2[length(MSE_list2)+1] = MSE
+  
+  # Bias
+  bias_sqr &lt;- (mean(true_y - y_hat))^2
+  
+  Bias_list2[length(Bias_list2)+1] = bias_sqr
+  
+  # Variance
+  variance &lt;- var(y_hat)
+  
+  Var_list2[length(Var_list2)+1] = variance
+}
+
+# Sigma-Squared
+sigma_sqr &lt;- (sigma)^2
+
+MSE_final &lt;- mean(MSE_list2)
+Bias &lt;- mean(Bias_list2)
+Var &lt;- mean(Var_list2)
+sigma_sqr &lt;- (sigma)^2
+
+Total &lt;- Bias + Var + sigma_sqr
+
+table &lt;- matrix(c(MSE_final, Bias, Var, sigma_sqr, Total),ncol=5,byrow=TRUE)
+colnames(table) &lt;- c(&quot;MSE&quot;,&quot;Bias-Squared&quot;,&quot;Variance&quot;, &quot;Irreducible&quot;, &quot;Sum&quot;)
+rownames(table) &lt;- c(&quot;X&quot;)
+table &lt;- as.table(table)
+table</code></pre>
+<pre><code>##          MSE Bias-Squared   Variance Irreducible        Sum
+## X 0.40789638   0.32444902 0.08359347  0.09000000 0.49804249</code></pre>
+</div>
+<div id="spline-model-df99" class="section level3">
+<h3>Spline Model df=99</h3>
+<pre class="r"><code>MSE_list99 &lt;- c()
+
+Var_list99 &lt;- c()
+
+Bias_list99 &lt;- c()
+
+# dataset of true value
+true_y &lt;- rep(0.95^2, 500)
+
+for(i in 1:10000) {
+  sampled_points &lt;- generate_sample(f, n, sigma)
+
+  # Fit splines with df=2 and add to plot
+  model1 &lt;- smooth.spline(x=sampled_points$x, y=sampled_points$y, df=99) 
+  
+  # Predictions
+  y_hat &lt;- predict(model1, newdata=test_set) %&gt;% 
+  tibble::as.tibble()
+  y_hat &lt;- y_hat$y
+  
+  # MSE and RMSE
+  MSE &lt;- mean((true_y - y_hat)^2)
+  RMSE &lt;- sqrt(MSE)
+  
+  MSE_list99[length(MSE_list99)+1] = MSE
+  
+  # Bias
+  bias_sqr &lt;- (mean(true_y - y_hat))^2
+  
+  Bias_list99[length(Bias_list99)+1] = bias_sqr
+  
+  # Variance
+  variance &lt;- var(y_hat)
+  
+  Var_list99[length(Var_list99)+1] = variance
+}
+
+# Sigma-Squared
+sigma_sqr &lt;- (sigma)^2
+
+MSE_final &lt;- mean(MSE_list99)
+Bias &lt;- mean(Bias_list99)
+Var &lt;- mean(Var_list99)
+sigma_sqr &lt;- (sigma)^2
+
+Total &lt;- Bias + Var + sigma_sqr
+
+table &lt;- matrix(c(MSE_final, Bias, Var, sigma_sqr, Total),ncol=5,byrow=TRUE)
+colnames(table) &lt;- c(&quot;MSE&quot;,&quot;Bias-Squared&quot;,&quot;Variance&quot;, &quot;Irreducible&quot;, &quot;Sum&quot;)
+rownames(table) &lt;- c(&quot;X&quot;)
+table &lt;- as.table(table)
+table</code></pre>
+<pre><code>##         MSE Bias-Squared  Variance Irreducible       Sum
+## X 0.4288199    0.3244551 0.1045685   0.0900000 0.5190236</code></pre>
+</div>
 </div>
 <div id="tables" class="section level1">
 <h1>Tables</h1>
@@ -293,7 +407,7 @@ n_sample &lt;- 10000</code></pre>
 <td align="right">X</td>
 <td align="right">X</td>
 <td align="right">X</td>
-<td align="right">X</td>
+<td align="right"></td>
 </tr>
 </tbody>
 </table>
@@ -310,9 +424,10 @@ n_sample &lt;- 10000</code></pre>
 </ol>
 <p><strong>Answers</strong>:</p>
 <ol style="list-style-type: decimal">
-<li></li>
-<li></li>
-<li></li>
+<li>One possible sanity check would be to test your model on new data or your whole training dataset and see if it is accurate in its predictions.</li>
+<li>If we wanted to get the breakdown of <span class="math inline">\(\mbox{MSE}\left[\widehat{f}(x)\right]\)</span> for <em>all</em> <span class="math inline">\(x\)</span> in this example, and not just for <span class="math display">\[\mbox{MSE}\left[\widehat{f}(x_0)\right]
+= \mbox{MSE}\left[\widehat{f}(0.95)\right]\]</span> then we would need to do the procedure above, but for each <span class="math inline">\(x\)</span> in the training dataset from 1:500 rather than just 0.95.</li>
+<li>I would choose the model with the df=99 because over time on average the model does well in predicting the outcome. Evidence of the law of large numbers.</li>
 </ol>
 </div>
 
